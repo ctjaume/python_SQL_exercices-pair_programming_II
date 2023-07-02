@@ -62,3 +62,13 @@ Ahora nos piden una lista con cada tipo de producto que se han vendido, sus cate
  nombre de la categoría y el nombre del producto, y el total de dinero por el que se ha 
  vendido cada tipo de producto (teniendo en cuenta los descuentos).
 Pista Necesitaréis usar 3 joins.*/
+
+SELECT products.product_id AS IdProducto, products.product_name AS NombreProducto, 
+categories.category_id AS IdCategoria, categories.category_name AS Categoria, 
+SUM(order_details.unit_price * order_details.quantity * order_details.discount) AS TotalVentas
+FROM products
+NATURAL JOIN categories
+NATURAL JOIN order_details
+GROUP BY products.product_id
+ORDER BY TotalVentas DESC
+;
