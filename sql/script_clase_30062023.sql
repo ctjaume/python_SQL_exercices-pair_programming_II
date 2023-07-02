@@ -22,26 +22,16 @@ anteriory han decidido pedirnos una serie de consultas adicionales.
  durante cada año. Nos piden concretamente conocer el nombre de la empresa, el año, y 
  la cantidad de objetos que han pedido. Para ello hará falta hacer 2 joins.*/
  
- /*Primer join es una copia del anterior*/
-SELECT count(orders.order_id) AS TotalPEdidos, customers.customer_id, customers.company_name
+
+SELECT count(orders.order_id) AS TotalPedidos, customers.customer_id, customers.company_name, count(order_details.quantity) cantidadProductos
 FROM customers 
 INNER JOIN orders
 ON customers.customer_id = orders.customer_id
+INNER JOIN order_details
+ON orders.order_id =  order_details.order_id
 WHERE customers.country = 'UK'
 GROUP BY customers.company_name, customers.customer_id;
 
-SELECT count(order_id) AS TotalPEdidos, customer_id
-FROM orders
-WHERE ship_country = 'UK'
-group by shipped_date, customer_id;
- 
- /*Segundo join es añadir la tabla orders year(shipped date)*/
-  SELECT count(orders.order_id) AS TotalPEdidos, customers.customer_id, customers.company_name
- FROM customers 
- INNER JOIN orders
- ON customers.customer_id = orders.customer_id
- WHERE customers.country = 'UK'
- GROUP BY customers.company_name, customers.customer_id;
  
  /*3. Mejorad la query anterior:
  Lo siguiente que nos han pedido es la misma consulta anterior pero con la adición de la 
@@ -49,10 +39,23 @@ group by shipped_date, customer_id;
  descuentos, etc. Ojo que los descuentos en nuestra tabla nos salen en porcentajes, 15% 
  nos sale como 0.15.*/
  
+ SELECT count(orders.order_id) AS TotalPedidos, customers.customer_id, customers.company_name, sum(order_details.quantity) as cantidadProductos, sum(order_details.unit_price *  order_details.quantity* (1- order_details.discount)) as dineroTotal
+FROM customers 
+INNER JOIN orders
+ON customers.customer_id = orders.customer_id
+INNER JOIN order_details
+ON orders.order_id =  order_details.order_id
+WHERE customers.country = 'UK'
+GROUP BY customers.company_name, customers.customer_id;
+ 
  /*4. BONUS: Pedidos que han realizado cada compañía y su fecha:
 Después de estas solicitudes desde UK y gracias a la utilidad de los resultados que se han
  obtenido, desde la central nos han pedido una consulta que indique el nombre de cada 
  compañia cliente junto con cada pedido que han realizado y su fecha.*/
+ SELECT customers.company_name, orders.order_id, orders.shipped_date
+ FROM customers
+ INNER JOIN orders
+ ON customers.customer_id = orders.customer_id;
  
  /*5. BONUS: Tipos de producto vendidos:
 Ahora nos piden una lista con cada tipo de producto que se han vendido, sus categorías,
