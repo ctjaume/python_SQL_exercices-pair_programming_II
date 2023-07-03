@@ -7,8 +7,9 @@ el nombre de todas las empresas cliente, los ID de sus pedidos y las fechas.
 Los resultados deberán similares a la siguiente tabla
 OrderID / CompanyName / OrderDate */
 
-
-
+SELECT customers.company_name AS CompanyName, orders.order_id AS OrderID, orders.order_date AS OrderDate
+FROM customers
+NATURAL JOIN orders;
 
 
 /*Pedidos por cliente de UK:
@@ -19,7 +20,12 @@ el nombre de cada compañía cliente junto con el número de pedidos.
 La tabla resultante será:
 NombreCliente / NumeroPedidos  */
 
-
+SELECT customers.company_name AS NombreCliente, COUNT(orders.order_id) AS NumeroPedidos
+FROM customers
+NATURAL JOIN orders
+WHERE customers.country = 'UK'
+GROUP BY customers.company_name
+;
 
 
 /*Empresas de UK y sus pedidos:
@@ -29,7 +35,12 @@ que han realizado y la fecha del pedido.
 Los resultados de la query deberán ser:
 OrderID / NombreCliente / FechaPedido */
 
-
+SELECT orders.order_id AS OrderID, customers.company_name AS NombreCliente, orders.order_date AS FechaPedido
+FROM customers
+RIGHT JOIN orders
+ON customers.customer_id = orders.customer_id
+WHERE customers.country = 'UK'
+;
 
 
 /*Empleadas que sean de la misma ciudad:
@@ -40,7 +51,11 @@ como de las jefas. Investiga el resultado, ¿sabes decir quién es el director?
 La tabla resultado de la query deberá ser:
 city / NombreEmpleado / ApellidoEmpleado / City / NombreJefe / ApellidoJefe */
 
-
+SELECT a.city AS CiudadEmpleado, a.first_name AS NombreEmpleado, a.last_name AS ApellidoEmpleado, 
+b.city AS CiudadJefe, b.first_name AS NombreJefe, b.last_name AS ApellidoJefe
+FROM employees AS a, employees AS b
+WHERE a.reports_to = b.employee_id  -- en SELF JOIN se usa WHERE en vez de ON
+;
 
 
 /*ESTE EJERCICIO NO SE EVALUARÁ SI NO ES ENTREGADO
@@ -50,3 +65,13 @@ tengan pedidos asociados o no. Muestra el ID del pedido, el nombre de la empresa
 y la fecha del pedido (si existe).
 La tabla resultado deberá similar a:
 OrderID / NombreClientes / FechaPedido */
+
+SELECT orders.order_id AS OrderID, customers.company_name, orders.order_date AS FechaPedido
+FROM orders 
+LEFT JOIN customers 
+ON customers.customer_id = orders.customer_id
+UNION
+SELECT orders.order_id AS OrderID, customers.company_name, orders.order_date AS FechaPedido
+FROM orders
+RIGHT JOIN customers
+ON customers.customer_id = orders.customer_id;
